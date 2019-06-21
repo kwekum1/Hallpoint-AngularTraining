@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Page Title</title>
+<style>
+
+#container {
+	min-width: 310px;
+	max-width: 800px;
+	height: 400px;
+	margin: 0 auto
+}
+
+</style>
+<script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script
+  src="https://code.jquery.com/jquery-3.4.1.min.js"
+  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+  crossorigin="anonymous"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/series-label.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+
+
+<script>
+
+
+
+// A $( document ).ready() block.
+$( document ).ready(function() {
+
+var imgData,pdf,page_section,HTML_Width,HTML_Height,top_left_margin,PDF_Width,PDF_Height,canvas_image_width,canvas_image_height;
+
+
+function calculatePDF_height_width(selector,index){
+ page_section = $(selector).eq(index);
+ HTML_Width = page_section.width();
+ HTML_Height = page_section.height();
+ top_left_margin = 15;
+ PDF_Width = HTML_Width + (top_left_margin * 2);
+ PDF_Height = (PDF_Width * 1.2) + (top_left_margin * 2);
+ canvas_image_width = HTML_Width;
+ canvas_image_height = HTML_Height;
+ }
+
+
+
+
+Highcharts.setOptions({
+hideDelay: 0
+});
+
+
+
+Highcharts.chart('container', {
+
+    title: {
+        text: 'Solar Employment Growth by Sector, 2010-2016'
+    },
+
+    subtitle: {
+        text: 'Source: thesolarfoundation.com'
+    },
+
+    yAxis: {
+        title: {
+            text: 'Number of Employees'
+        }
+    },
+    legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
+
+    plotOptions: {
+        series: {
+		animation: false,
+            label: {
+                connectorAllowed: false
+            },
+            pointStart: 2010
+		
+        }
+    },
+
+    series: [{
+        name: 'Installation',
+        data: [43934, 52503, 57177, 69658, 97031, 119931, 137133, 154175]
+    }, {
+        name: 'Manufacturing',
+        data: [24916, 24064, 29742, 29851, 32490, 30282, 38121, 40434]
+    }, {
+        name: 'Sales & Distribution',
+        data: [11744, 17722, 16005, 19771, 20185, 24377, 32147, 39387]
+    }, {
+        name: 'Project Development',
+        data: [null, null, 7988, 12169, 15112, 22452, 34400, 34227]
+    }, {
+        name: 'Other',
+        data: [12908, 5948, 8105, 11248, 8989, 11816, 18274, 18111]
+    }],
+
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+
+});
+
+
+
+var container = document.getElementById("container");; // full page 
+ html2canvas(container,{allowTaint : true}).then(function(canvas) {
+ 
+  calculatePDF_height_width("#container",0);
+  imgData = canvas.toDataURL("image/png", 1.0);
+ 
+ 
+ 
+ var link = document.createElement("a");
+ document.body.appendChild(link);
+ link.download = "html_image.png";
+ link.href = canvas.toDataURL("image/png");
+ link.target = '_blank';
+ link.click();
+ 
+ 
+ var doc = new jsPDF()
+
+
+            //alert(PDF_Width);
+			//alert(PDF_Height);
+			//alert(top_left_margin);
+			//alert(HTML_Width);
+			//alert(HTML_Height);
+            //doc.addPage(PDF_Width, PDF_Height);
+            doc.addImage(imgData, 'JPG', 0, 0, 130, 56);
+
+
+
+doc.text('Hello world!', 10, 10)
+doc.save('a4.pdf')
+
+ 
+ 
+ });
+
+
+
+
+});
+
+</script>
+</head>
+<body>
+<div id="htmltoimage">
+This is an example
+<div class="imgbg"></div>
+<div id="container"></div>
+
+</div>
+
+<h1>This is a Heading</h1>
+<p>This is a paragraph.</p>
+
+</body>
+</html>
