@@ -12,7 +12,7 @@ export interface State extends fromRoot.State {
 
 export interface ProductState {
     showProductCode: boolean;
-    currentProduct: Product;
+    currentProductId: number | null;
     products: Product[];
     error: string;
 }
@@ -20,7 +20,7 @@ export interface ProductState {
 
 const initialState : ProductState = {
     showProductCode: true,
-    currentProduct: null,
+    currentProductId: null,
     products: [],
     error: ''
 
@@ -35,10 +35,30 @@ export const getShowProductCode = createSelector(
     state => state.showProductCode
 )
 
+
+export const getCurrentProductId = createSelector(
+    getProductFeatureState,
+    state => state.currentProductId
+)
+
+
 export const getCurrentProduct = createSelector(
     getProductFeatureState,
-    state => state.currentProduct
-)
+    getCurrentProductId,
+    (state, currentProductId) => { 
+        if (currentProductId === 0) {
+            return {
+                id: 0,
+                productName: '',
+                productCode: 'New',
+                description: '',
+                starRating: 0
+            };
+        } else {
+            return getCurrentProductId ? state.products.find(p => p.id === currentProductId) : null;
+        }
+    }
+);
 
 export const getProducts = createSelector(
     getProductFeatureState,
@@ -58,7 +78,7 @@ export function reducer(state = initialState, action: ProductActions): ProductSt
         case ProductActionTypes.SetCurrentProduct:
             return {
                 ...state,
-                currentProduct: { ...action.payload}
+                currentProductId: action.payload.id
             };
         
 
@@ -72,21 +92,14 @@ export function reducer(state = initialState, action: ProductActions): ProductSt
     case ProductActionTypes.ClearCurrentProduct:
         return{
             ...state,
-            currentProduct: null
+            currentProductId: null
         };
 
 
     case ProductActionTypes.InitializeCurrentProduct:
         return {
             ...state,
-            currentProduct: {
-                id: 0,
-                productName: '',
-                productCode: 'New',
-                description: '',
-                starRating: 0
-
-            }
+            currentProductId: 0 
         }; 
         
         case ProductActionTypes.LoadSuccess:
@@ -101,7 +114,47 @@ export function reducer(state = initialState, action: ProductActions): ProductSt
                     ...state,
                     products: [],
                     error: action.payload
-                }
+                };
+
+                case ProductActionTypes.CreateProductSuccess:
+                return {
+                        ...state,
+                        products: [...state.products, action.payload],
+                        currentProductId: action.payload.id,
+                        error: '' 
+                    }; 
+
+                    case ProductActionTypes.UpdateProductSuccess:
+                        const updatedProducts = state.products.map(
+                            item => action.payload.id === item.id ? action.payload : item);
+                        return {
+                            ...state,
+                            products: updatedProducts,
+                            currentProductId: action.payload.id,
+                            error: ''
+                        };
+
+                        case ProductActionTypes.UpdateProductFail:
+                            return {
+                                ...state,
+                                error: action.payload
+                            };
+
+                                // After a delete, the currentProduct is null.
+    case ProductActionTypes.DeleteProductSuccess:
+            return {
+              ...state,
+              products: state.products.filter(product => product.id !== action.payload),
+              currentProductId: null,
+              error: ''
+            };
+      
+          case ProductActionTypes.DeleteProductFail:
+            return {
+              ...state,
+              error: action.payload
+            };
+
 
 
     default:
