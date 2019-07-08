@@ -7,3 +7,7 @@ This is for the AngularJs tutorial as well as practice
 The content is found here:
 
 https://github.com/DeborahK/Angular-GettingStarted
+
+## Public Apis
+Here are the links to public apis:
+https://github.com/public-apis/public-apis
