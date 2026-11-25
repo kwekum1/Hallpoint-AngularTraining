@@ -1,29 +1,29 @@
-import { Component, OnInit, OnChanges, Input, Output,EventEmitter } from '@angular/core';
+import {
+  Component,
+  OnChanges,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy
+} from '@angular/core';
 
 @Component({
   selector: 'pm-star',
   templateUrl: './star.component.html',
-  styleUrls: ['./star.component.css']
+  styleUrls: ['./star.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false
 })
-export class StarComponent implements OnInit, OnChanges {
- 
- 
+export class StarComponent implements OnChanges {
+  @Input() rating = 0;
+  starWidth = 0;
+  @Output() ratingClicked: EventEmitter<string> = new EventEmitter<string>();
+
   ngOnChanges(): void {
-   this.starWidth = this.rating * 75 / 5;
+    this.starWidth = (this.rating * 75) / 5;
   }
 
-@Input() rating: number;
-starWidth: number;
-@Output() ratingClicked: EventEmitter<string> = new EventEmitter<string>(); 
-
-onClick() {
-  this.ratingClicked.emit(`The rating is ${this.rating} was clicked!`);
-}
-
-
-  constructor() { }
-
-  ngOnInit() {
+  onClick(): void {
+    this.ratingClicked.emit(`The rating is ${this.rating} was clicked!`);
   }
-
 }
